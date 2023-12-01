@@ -1,9 +1,8 @@
-import 'package:note_it/services/notes/notes_service.dart';
-import 'package:note_it/services/notifications/task_result.dart';
 import 'package:flutter/material.dart';
 
 class CreateNoteSheet extends StatefulWidget {
-  const CreateNoteSheet({super.key});
+  const CreateNoteSheet({super.key, required this.onCreation});
+  final void Function({required String content}) onCreation;
 
   @override
   State<CreateNoteSheet> createState() => _CreateNoteSheetState();
@@ -11,8 +10,6 @@ class CreateNoteSheet extends StatefulWidget {
 
 class _CreateNoteSheetState extends State<CreateNoteSheet> {
   late TextEditingController _newNoteContent;
-  final NoteService _notesService = NoteService.fromDRF();
-  TaskResult? creationResponse;
 
   @override
   void initState() {
@@ -61,11 +58,8 @@ class _CreateNoteSheetState extends State<CreateNoteSheet> {
                               child: const Text('Create'),
                               onPressed: () async {
                                 if (_newNoteContent.text.isNotEmpty) {
-                                  creationResponse = await _notesService.createNote (
-                                      content: _newNoteContent.text);
-                                } else {
-                                  creationResponse = TaskResult.failure(message: "Cannot create empty notes");
-                                }
+                                  widget.onCreation(content: _newNoteContent.text);
+                                } 
                                 Navigator.pop(context);
                               },
                             ),

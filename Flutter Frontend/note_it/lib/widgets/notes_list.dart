@@ -1,15 +1,20 @@
 import 'package:note_it/services/notes/notes_note.dart';
-import 'package:note_it/services/notes/notes_service.dart';
-import 'package:note_it/services/notifications/task_result.dart';
 import 'package:note_it/widgets/note_list_tile.dart';
 import 'package:flutter/material.dart';
 
 class NotesList extends StatelessWidget {
-  NotesList(
-      {super.key, required this.listOfNotes, required this.triggerRefresh});
+  NotesList({
+    super.key,
+    required this.listOfNotes,
+    required this.onDeletion,
+    required this.onUpdation,
+  });
   final List<Note> listOfNotes;
-  final Future<void> Function() triggerRefresh;
-  final NoteService _noteService = NoteService.fromDRF();
+  final void Function({required Note note}) onDeletion;
+  final void Function({
+    required Note oldNote,
+    required Note updatedNote,
+  }) onUpdation;
 
   @override
   Widget build(BuildContext context) {
@@ -45,16 +50,14 @@ class NotesList extends StatelessWidget {
                 print('Deletion confirmed by user: $confirmed');
 
                 if (confirmed) {
-                  TaskResult deleteResponse = await _noteService.deleteNote(note: listOfNotes[index]);
-                  if (!deleteResponse.success) {
-                    confirmed = false;
-                  }
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(SnackBar(content: Text(deleteResponse.message)));
+                  onDeletion(note: listOfNotes[index]);
                 }
                 return confirmed;
               },
-              child: NoteListTile(currentNote: listOfNotes[index]));
+              child: NoteListTile(
+                currentNote: listOfNotes[index],
+                onUpdation: onUpdation,
+              ));
         });
   }
 }

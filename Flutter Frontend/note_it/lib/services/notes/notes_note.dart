@@ -1,6 +1,7 @@
+import 'package:equatable/equatable.dart';
 import 'package:note_it/services/notes/notes_exceptions.dart';
 
-class Note {
+class Note extends Equatable {
   final String content;
   final String url;
 
@@ -29,4 +30,7 @@ class Note {
         url: note.url,
         content: content,
       );
+
+  @override
+  List<Object?> get props => [content, url];
 }

@@ -22,8 +22,9 @@ class NotesLoadedState extends NoteState {
 
 class NotesErrorState extends NoteState {
   final String errorMessage;
+  final List<Note> listOfNotes;
 
-  const NotesErrorState({required this.errorMessage});
+  const NotesErrorState({required this.listOfNotes,required this.errorMessage});
   
   @override
   List<Object?> get props => [];
@@ -31,8 +32,9 @@ class NotesErrorState extends NoteState {
 
 class TaskOnNoteSuccessfulState extends NoteState {
   final String successMessage;
+  final List<Note> listOfNotes;
 
-  const TaskOnNoteSuccessfulState({required this.successMessage});
+  const TaskOnNoteSuccessfulState({required this.listOfNotes,required this.successMessage});
   
   @override
   List<Object?> get props => [successMessage];

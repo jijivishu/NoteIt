@@ -10,7 +10,7 @@ import 'package:http/http.dart' as http;
 class DRFNoteProvider implements NoteProvider {
   // Constants
   static const String allNotesAPIlocation =
-      'http://199.111.111.11:8000/notes/'; // Link where the rest framework is running
+      'http://192.168.236.27:8000/notes/'; // Link where the rest framework is running
   static final Uri allNotesAPIURL = Uri.parse(allNotesAPIlocation);
 
   static const Map<int, String> statusMessages = {
@@ -27,6 +27,10 @@ class DRFNoteProvider implements NoteProvider {
 
   @override
   Future<TaskResult> createNote({required String content}) async {
+    if (content.isEmpty) {
+      return TaskResult.failure(message: "Cannot create empty notes");
+    }
+
     try {
       final response = await http.post(
         allNotesAPIURL,

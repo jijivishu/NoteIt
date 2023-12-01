@@ -1,6 +1,4 @@
 import 'package:note_it/services/notes/notes_note.dart';
-import 'package:note_it/services/notes/notes_service.dart';
-import 'package:note_it/services/notifications/task_result.dart';
 import 'package:flutter/material.dart';
 
 class NoteDisplayView extends StatefulWidget {
@@ -15,7 +13,6 @@ class NoteDisplayView extends StatefulWidget {
 
 class _NoteDisplayViewState extends State<NoteDisplayView> {
   late final TextEditingController _newNoteContent;
-  static final NoteService _noteService = NoteService.fromDRF();
 
   Future<bool?> _shouldUpdateNote(BuildContext context) async {
     bool? saveChanges = await showDialog<bool>(
@@ -59,7 +56,11 @@ class _NoteDisplayViewState extends State<NoteDisplayView> {
 
   @override
   Widget build(BuildContext context) {
-    final note = ModalRoute.of(context)!.settings.arguments as Note;
+    Map<String, dynamic> arguments =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final Note note = arguments['currentNote'];
+    final void Function({required Note oldNote, required Note updatedNote})
+        onUpdation = arguments['onUpdation'];
     final oldNoteContent = note.content;
     _newNoteContent.text = oldNoteContent;
 
@@ -73,12 +74,7 @@ class _NoteDisplayViewState extends State<NoteDisplayView> {
           print(mustUpdateNote);
           if (mustUpdateNote ?? false) {
             final updatedNote = Note.updatedNote(note, _newNoteContent.text);
-            final TaskResult _updateResponse = await _noteService.updateNote(
-              oldNote: note,
-              updatedNote: updatedNote,
-            );
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(_updateResponse.message)));
+            onUpdation(oldNote: note, updatedNote: updatedNote);
           }
           if (context.mounted && mustUpdateNote != null) {
             Navigator.of(context).pop();

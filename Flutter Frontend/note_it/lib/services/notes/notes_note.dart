@@ -20,4 +20,13 @@ class Note {
       _ => throw InvalidFormatNoteFromDRFException(),
     };
   }
+
+  factory Note.updatedNote(
+    Note note,
+    String content,
+  ) =>
+      Note(
+        url: note.url,
+        content: content,
+      );
 }

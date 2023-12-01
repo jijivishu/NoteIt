@@ -28,6 +28,9 @@ class NoteService implements NoteProvider {
   @override
   Future<TaskResult> updateNote({
     required Note oldNote,
-    required String newNoteContent,
-  }) => provider.updateNote(oldNote: oldNote, newNoteContent: newNoteContent);
+    required Note updatedNote,
+  }) => provider.updateNote(oldNote: oldNote, updatedNote: updatedNote);
+  
+  @override
+  List<Note> listOfNotes = [];
 }

@@ -9,7 +9,8 @@ import 'package:http/http.dart' as http;
 
 class DRFNoteProvider implements NoteProvider {
   // Constants
-  static const String allNotesAPIlocation = 'http://199.111.111.11:8000/notes/'; // Link where the rest framework is running
+  static const String allNotesAPIlocation =
+      'http://199.111.111.11:8000/notes/'; // Link where the rest framework is running
   static final Uri allNotesAPIURL = Uri.parse(allNotesAPIlocation);
 
   static const Map<int, String> statusMessages = {
@@ -23,7 +24,6 @@ class DRFNoteProvider implements NoteProvider {
     409: 'Conflict detected.',
     500: 'Server Failure',
   };
-
 
   @override
   Future<TaskResult> createNote({required String content}) async {
@@ -49,7 +49,6 @@ class DRFNoteProvider implements NoteProvider {
       return TaskResult.failure(message: 'Failed to update Note');
     }
   }
-
 
   @override
   Future<TaskResult> deleteNote({required Note note}) async {
@@ -78,7 +77,6 @@ class DRFNoteProvider implements NoteProvider {
     }
   }
 
-
   @override
   Future<Note> fetchNote({required Uri url}) async {
     final response = await http.get(
@@ -93,10 +91,9 @@ class DRFNoteProvider implements NoteProvider {
     }
   }
 
-
   @override
   Future<TaskResult> updateNote(
-      {required Note oldNote, required String newNoteContent}) async {
+      {required Note oldNote, required Note updatedNote}) async {
     final url = Uri.parse(oldNote.url);
     try {
       final response = await http.put(
@@ -104,7 +101,7 @@ class DRFNoteProvider implements NoteProvider {
         headers: <String, String>{
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({'note': newNoteContent}),
+        body: jsonEncode({'note': updatedNote.content}),
       );
       final int statusCode = response.statusCode;
 
@@ -122,4 +119,39 @@ class DRFNoteProvider implements NoteProvider {
       return TaskResult.failure(message: 'Failed to update Note');
     }
   }
+
+  Future<TaskResult> fetchAllNotes() async {
+    try {
+      final response = await http.get(
+        allNotesAPIURL,
+        headers: {'Content-Type': 'application/json'},
+      );
+      final int statusCode = response.statusCode;
+
+      if (statusCode == 200) {
+        final decodedData = jsonDecode(response.body);
+        final List<Map<String, dynamic>> receivedNotes =
+            List<Map<String, dynamic>>.from(decodedData);
+        List<Note> allNotes = [];
+        for (Map<String, dynamic> note in receivedNotes) {
+          allNotes.add(Note.fromDRF(note));
+        }
+        listOfNotes = allNotes;
+        return TaskResult.success(message: 'Note Updated');
+      }
+      
+      return TaskResult.failure(
+          message: statusMessages[statusCode] ?? "Failed to update Note");
+    } catch (error) {
+      if (error is SocketException) {
+        return TaskResult.failure(
+            message:
+                'Failed to connect to the internet. Please check your connection.');
+      }
+      return TaskResult.failure(message: 'Failed to load Notes');
+    }
+  }
+
+  @override
+  List<Note> listOfNotes = [];
 }

@@ -72,9 +72,10 @@ class _NoteDisplayViewState extends State<NoteDisplayView> {
           final bool? mustUpdateNote = await _shouldUpdateNote(context);
           print(mustUpdateNote);
           if (mustUpdateNote ?? false) {
+            final updatedNote = Note.updatedNote(note, _newNoteContent.text);
             final TaskResult _updateResponse = await _noteService.updateNote(
               oldNote: note,
-              newNoteContent: _newNoteContent.text,
+              updatedNote: updatedNote,
             );
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(content: Text(_updateResponse.message)));
